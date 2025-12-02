@@ -9,7 +9,7 @@ from lunar_python import Lunar, Solar
 # 1. 基礎設定與資料讀取
 # ==========================================
 
-# 修改點：更新瀏覽器標籤名稱
+# 設定網頁標題
 st.set_page_config(page_title="姓名吉凶檢測", layout="wide")
 
 @st.cache_data
@@ -199,7 +199,6 @@ def parse_chart_text(text):
 # 4. 介面設計 (Streamlit UI)
 # ==========================================
 
-# 修改點：更新網頁標題
 st.title("姓名吉凶檢測")
 st.markdown("---")
 
@@ -254,7 +253,6 @@ if run_analysis:
     
     # 初始化報告字串
     final_report = []
-    # 修改點：報告標題也同步更新
     final_report.append(f"【姓名吉凶檢測報告】")
     final_report.append(f"命主：{last_name}{first_name} ({gender})")
     final_report.append(f"列印時間：{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
@@ -391,3 +389,9 @@ if run_analysis:
         file_name=f"命名報告_{last_name}{first_name}.txt",
         mime="text/plain"
     )
+
+    # --- 實用工具推薦 (頁腳) ---
+    st.markdown("---")
+    st.subheader("實用工具推薦")
+    st.write("查找漢字筆畫，推薦前往【康熙字典】網站：")
+    st.markdown("https://www.kangxizidian.com/index.php")
