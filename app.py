@@ -9,7 +9,8 @@ from lunar_python import Lunar, Solar
 # 1. 基礎設定與資料讀取
 # ==========================================
 
-st.set_page_config(page_title="紫微姓名吉凶檢測", layout="wide")
+# 修改點：更新瀏覽器標籤名稱
+st.set_page_config(page_title="姓名吉凶檢測", layout="wide")
 
 @st.cache_data
 def load_data():
@@ -148,8 +149,8 @@ def calculate_joy_god(disaster_element, strength="強"):
         rules = {"木": "水", "火": "木", "土": "火", "金": "土", "水": "金"}
         return rules.get(disaster_element, "木")
 
-def parse_wenmo_text(text):
-    """解析文墨天機文字"""
+def parse_chart_text(text):
+    """解析命盤文字內容"""
     zhi_map = {"子": "水", "丑": "土", "寅": "木", "卯": "木", "辰": "土", "巳": "火",
                "午": "火", "未": "土", "申": "金", "酉": "金", "戌": "土", "亥": "水"}
     ji_keywords = ["生年忌", "化忌", "[忌]"] 
@@ -180,7 +181,7 @@ def parse_wenmo_text(text):
                     palace_scores[current_palace]["details"].append(f"{kw}(+1)")
 
     if not palace_scores:
-        return None, None, "無法辨識文字內容。"
+        return None, None, "無法辨識文字內容，請確認是否為相容的排盤格式。"
         
     sorted_palaces = sorted(palace_scores.items(), key=lambda x: x[1]['score'], reverse=True)
     top_palace_name = sorted_palaces[0][0]
@@ -198,7 +199,8 @@ def parse_wenmo_text(text):
 # 4. 介面設計 (Streamlit UI)
 # ==========================================
 
-st.title("紫微姓名吉凶檢測")
+# 修改點：更新網頁標題
+st.title("姓名吉凶檢測")
 st.markdown("---")
 
 # --- 側邊欄 ---
@@ -214,11 +216,11 @@ with st.sidebar:
     tab_text, tab_manual = st.tabs(["貼上文字", "手動設定"])
     
     with tab_text:
-        st.caption("請將「文墨天機」的命盤文字完整複製貼上：")
+        st.caption("請將排盤軟體輸出的文字內容完整複製貼上：")
         raw_text = st.text_area("命盤文字內容", height=150)
         if st.button("解析文字"):
             if len(raw_text) > 50:
-                p_name, p_joy, p_report = parse_wenmo_text(raw_text)
+                p_name, p_joy, p_report = parse_chart_text(raw_text)
                 if p_name:
                     st.session_state['ai_zai'] = p_name
                     st.session_state['ai_joy'] = p_joy
@@ -252,7 +254,8 @@ if run_analysis:
     
     # 初始化報告字串
     final_report = []
-    final_report.append(f"【紫微姓名吉凶檢測報告】")
+    # 修改點：報告標題也同步更新
+    final_report.append(f"【姓名吉凶檢測報告】")
     final_report.append(f"命主：{last_name}{first_name} ({gender})")
     final_report.append(f"列印時間：{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
     final_report.append("-" * 30)
@@ -385,6 +388,6 @@ if run_analysis:
     st.download_button(
         label="下載完整分析報告 (.txt)",
         data=report_str,
-        file_name=f"紫微命名報告_{last_name}{first_name}.txt",
+        file_name=f"命名報告_{last_name}{first_name}.txt",
         mime="text/plain"
     )
