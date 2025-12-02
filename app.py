@@ -392,6 +392,6 @@ if run_analysis:
 
     # --- 實用工具推薦 (頁腳) ---
     st.markdown("---")
-    st.subheader("實用工具推薦")
+    st.subheader("實用工具")
     st.write("查找漢字筆畫，推薦前往【康熙字典】網站：")
     st.markdown("https://www.kangxizidian.com/index.php")
