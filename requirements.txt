@@ -1,0 +1,6 @@
+streamlit
+pandas
+openpyxl
+lunar-python
+google-generativeai
+Pillow
