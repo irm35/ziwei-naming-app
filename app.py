@@ -9,7 +9,7 @@ from lunar_python import Lunar, Solar
 # 1. 基礎設定與資料讀取
 # ==========================================
 
-st.set_page_config(page_title="紫微姓名吉凶檢測工具", layout="wide")
+st.set_page_config(page_title="紫微姓名吉凶檢測", layout="wide")
 
 @st.cache_data
 def load_data():
@@ -198,7 +198,7 @@ def parse_wenmo_text(text):
 # 4. 介面設計 (Streamlit UI)
 # ==========================================
 
-st.title("🟣 紫微姓名學架構工具 (可下載報告版)")
+st.title("紫微姓名吉凶檢測")
 st.markdown("---")
 
 # --- 側邊欄 ---
@@ -211,7 +211,7 @@ with st.sidebar:
     st.markdown("---")
     st.header("2. 命盤診斷模式")
     
-    tab_text, tab_manual = st.tabs(["📋 貼上文字", "🖐️ 手動設定"])
+    tab_text, tab_manual = st.tabs(["貼上文字", "手動設定"])
     
     with tab_text:
         st.caption("請將「文墨天機」的命盤文字完整複製貼上：")
@@ -245,31 +245,31 @@ with st.sidebar:
         joy_element = st.selectbox("喜用神", joy_opts, index=joy_idx)
 
     st.markdown("---")
-    run_analysis = st.button("🚀 開始運算架構", type="primary")
+    run_analysis = st.button("開始運算架構", type="primary")
 
 # --- 主畫面 ---
 if run_analysis:
     
     # 初始化報告字串
     final_report = []
-    final_report.append(f"【紫微姓名學分析報告】")
+    final_report.append(f"【紫微姓名吉凶檢測報告】")
     final_report.append(f"命主：{last_name}{first_name} ({gender})")
     final_report.append(f"列印時間：{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}")
     final_report.append("-" * 30)
     
-    st.success(f"🔍 **設定完成**：針對【{zai_gong_input}】進行補救，喜用神鎖定為【{joy_element}】。")
+    st.success(f"**設定完成**：針對【{zai_gong_input}】進行補救，喜用神鎖定為【{joy_element}】。")
     final_report.append(f"[先天診斷]")
     final_report.append(f"災宮 (煞星集中)：{zai_gong_input}")
     final_report.append(f"喜用神 (需補強五行)：{joy_element}")
     if report_text:
-        st.info(f"📋 **文字診斷報告**：\n{report_text}")
+        st.info(f"**文字診斷報告**：\n{report_text}")
         final_report.append(f"診斷依據：{report_text}")
     final_report.append("-" * 30)
     
     st.markdown("---")
     
     # 1. 現有名字
-    st.subheader(f"📊 現有名字分析：{last_name}{first_name}")
+    st.subheader(f"現有名字分析：{last_name}{first_name}")
     grids = calculate_five_grids(last_name, first_name)
     if grids:
         final_report.append(f"[現有名字分析：{last_name}{first_name}]")
@@ -282,7 +282,7 @@ if run_analysis:
             tot_txt = f"總格 {grids['總格']} ({get_81_luck(grids['總格'])[0]})"
             
             st.markdown(f"**{tian_txt}**")
-            st.markdown(f"**{ren_txt}** 👈 核心")
+            st.markdown(f"**{ren_txt}** (核心)")
             st.markdown(f"**{di_txt}**")
             st.markdown(f"**{wai_txt}**")
             st.markdown(f"**{tot_txt}**")
@@ -292,10 +292,10 @@ if run_analysis:
             
             ren_elem = ["水","木","木","火","火","土","土","金","金","水"][grids['人格']%10]
             if ren_elem == joy_element:
-                st.success(f"✅ 人格五行 ({ren_elem}) 符合喜用神！")
+                st.success(f"人格五行 ({ren_elem}) 符合喜用神！")
                 final_report.append(f"結果：人格五行 ({ren_elem}) 符合喜用神！(吉)")
             else:
-                st.warning(f"⚠️ 人格五行 ({ren_elem}) 未補強喜用神 ({joy_element})。")
+                st.warning(f"人格五行 ({ren_elem}) 未補強喜用神 ({joy_element})。")
                 final_report.append(f"結果：人格五行 ({ren_elem}) 未補強喜用神。")
         with col2:
             pattern, luck, desc = get_sancai_luck(grids['天格'], grids['人格'], grids['地格'])
@@ -306,5 +306,85 @@ if run_analysis:
     st.markdown("---")
 
     # 2. 正式命名推薦
-    st.subheader(f"📐 正式命名架構推薦 (針對姓氏：{last_name}，喜用：{joy_element})")
-    st.info("以下提供符合「三才五格」與「喜用神」的最佳筆畫組合，請依據筆畫數
+    st.subheader(f"正式命名架構推薦 (針對姓氏：{last_name}，喜用：{joy_element})")
+    st.info("以下提供符合「三才五格」與「喜用神」的最佳筆畫組合，請依據筆畫數自行挑選漢字。")
+    final_report.append("-" * 30)
+    final_report.append(f"[正式命名架構推薦]")
+    
+    if combo_db is not None:
+        s_stroke = get_strokes(last_name)[0]
+        valid_combos = combo_db[combo_db['surname_strokes'] == s_stroke]
+        
+        if not valid_combos.empty:
+            recommendations = valid_combos.head(5) 
+            
+            for idx, row in recommendations.iterrows():
+                n1_s = row['n1_strokes']
+                n2_s = row['n2_strokes']
+                total_s = s_stroke + n1_s + n2_s
+                
+                tian = s_stroke + 1
+                ren = s_stroke + n1_s
+                di = n1_s + n2_s
+                pat, sancai_luck, sancai_desc = get_sancai_luck(tian, ren, di)
+                total_luck, total_desc = get_81_luck(total_s)
+                
+                # 寫入報告
+                final_report.append(f"方案 {idx+1}：總格 {total_s} 畫 ({total_luck})")
+                final_report.append(f"  - 結構：姓 {s_stroke} + 名一 {n1_s}(建議屬{joy_element}) + 名二 {n2_s}")
+                final_report.append(f"  - 總格運勢：{total_desc}")
+                final_report.append(f"  - 三才配置：{pat} ({sancai_luck}) {sancai_desc}")
+                final_report.append("")
+                
+                with st.expander(f"方案 {idx+1}：總格 {total_s} 畫 ({total_luck})"):
+                    c1, c2, c3 = st.columns(3)
+                    c1.metric("姓氏", f"{s_stroke} 畫", last_name)
+                    c2.metric("名字首字", f"{n1_s} 畫", f"建議五行：{joy_element}")
+                    c3.metric("名字次字", f"{n2_s} 畫", "五行不限")
+                    
+                    st.markdown("#### 核心優點解析")
+                    st.markdown(f"- **總格運勢 ({total_luck})**：{total_desc}")
+                    st.markdown(f"- **三才配置 ({sancai_luck})**：{sancai_desc}")
+                    
+        else:
+            st.warning("資料庫中暫無適合此姓氏筆畫的完美組合。")
+            final_report.append("查無適合組合。")
+    else:
+        st.error("找不到 combinations.xlsx。")
+            
+    st.markdown("---")
+    
+    # 3. 別名推薦
+    st.subheader(f"旺運別名 (吉數與含義)")
+    st.info(f"以下為五行屬「{joy_element}」且數理為「吉」的筆畫數，適合用於別名、藝名或筆名補運：")
+    final_report.append("-" * 30)
+    final_report.append(f"[旺運別名建議 (補{joy_element})]")
+    
+    lucky_info_list = get_lucky_strokes_info(joy_element)
+    
+    if lucky_info_list:
+        for info in lucky_info_list:
+            num = info['num']
+            luck = info['luck']
+            desc = info['desc']
+            final_report.append(f"{num} 畫 ({luck})：{desc}")
+            with st.container():
+                c1, c2 = st.columns([1, 4])
+                with c1:
+                    st.button(f"{num} 畫", key=f"ln_{num}", help=f"五行屬{joy_element}")
+                with c2:
+                    st.markdown(f"**【{luck}】** {desc}")
+                st.divider() 
+    else:
+        st.write("查無對應筆畫。")
+        
+    # --- 下載按鈕 ---
+    st.markdown("---")
+    st.subheader("下載報告")
+    report_str = "\n".join(final_report)
+    st.download_button(
+        label="下載完整分析報告 (.txt)",
+        data=report_str,
+        file_name=f"紫微命名報告_{last_name}{first_name}.txt",
+        mime="text/plain"
+    )
